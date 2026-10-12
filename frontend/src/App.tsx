@@ -22,7 +22,7 @@ export default function App() {
   const [view, setView] = useState<LatestView | null>(null);
   const [records, setRecords] = useState<DailyRecord[]>([]);
   const [busy, setBusy] = useState(false);
-  const [notice, setNotice] = useState("문제 상황을 고르면 예시 결과가 표시됩니다.");
+  const [notice, setNotice] = useState("화면 미리보기입니다. 서버가 없어 실제 데이터 조회와 실패 재생은 사용할 수 없습니다.");
   const [apiAvailable, setApiAvailable] = useState(false);
   const [replay, setReplay] = useState<ReplayState | null>(null);
   const [replayPackage, setReplayPackage] = useState<ReplayPackageStatus | null>(null);
@@ -48,7 +48,7 @@ export default function App() {
     }
   }, []);
 
-  useEffect(() => {
+  useEffect(() => { if (import.meta.env.VITE_STATIC_PREVIEW === "true") return;
     void refresh();
     const refreshTimer = window.setInterval(() => { void refresh(); }, 60_000);
     return () => window.clearInterval(refreshTimer);
@@ -149,12 +149,12 @@ export default function App() {
             </button>
           ))}
         </nav>
-        <img className="sidebar-scene" src="/daejeon-sidebar-scenery.svg" alt="" aria-hidden="true" />
+        <img className="sidebar-scene" src={`${import.meta.env.BASE_URL}daejeon-sidebar-scenery.svg`} alt="" aria-hidden="true" />
         <div className="sidebar-caption"><span>DAEJEON ANIMAL NOTICE</span><br />유기동물 공고 모니터링 서비스</div>
       </aside>
 
       <main className="main-content">
-        {!apiAvailable && <div className="connection-banner"><span className="connection-dot" /> 백엔드 연결 대기 · 실제 데이터 수집 전</div>}
+        {!apiAvailable && <div className="connection-banner"><span className="connection-dot" /> 정적 화면 미리보기 · 서버 미연결 · 실제 데이터 없음</div>}
         {page === "home" && <HomePage {...pageProps} onNavigate={setPage} />}
         {page === "analysis" && <AnalysisPage records={records} />}
         {page === "reliability" && <ReliabilityPage view={view} apiAvailable={apiAvailable} />}
