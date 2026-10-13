@@ -154,7 +154,7 @@ export default function App() {
       </aside>
 
       <main className="main-content">
-        {!apiAvailable && <div className="connection-banner"><span className="connection-dot" /> 정적 화면 미리보기 · 서버 미연결 · 실제 데이터 없음</div>}
+        {!apiAvailable && <div className="connection-banner"><span className="connection-dot" /> 정적 화면 미리보기 · 서버 미연결 · 실제 데이터 없음 · 빈칸이나 대시는 0건을 뜻하지 않습니다.</div>}
         {page === "home" && <HomePage {...pageProps} onNavigate={setPage} />}
         {page === "analysis" && <AnalysisPage records={records} />}
         {page === "reliability" && <ReliabilityPage view={view} apiAvailable={apiAvailable} />}
