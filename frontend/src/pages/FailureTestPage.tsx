@@ -81,7 +81,7 @@ export function FailureTestPage({
       <div className="replay-sequence-actions">
         <button className="secondary-action" disabled={busy || !packageReady} onClick={onNormalSequence}>문제없이 자료를 가져온 경우</button>
         <button className="secondary-action" disabled={busy || !packageReady} onClick={onD2Sequence}>하루 뒤 자료와 비교한 경우</button>
-        <button className="secondary-action subtle-action" disabled={busy} onClick={onReset}>처음 상태로 돌아가기</button>
+        <button className="secondary-action subtle-action" disabled={busy || !packageReady} onClick={onReset}>처음 상태로 돌아가기</button>
       </div>
       <h3 className="replay-subheading">어떤 문제가 생겼는지 골라 보세요</h3>
       <div className="failure-options">{failures.map((item) => <button key={item.fixture} className={`failure-option ${replay?.last_run?.fixture_id === item.fixture ? "chosen" : ""}`} disabled={busy || !packageReady} onClick={() => onReplay(item.fixture)}><small>{item.criterion}</small><strong>{item.label}</strong><small>{item.transport}</small></button>)}</div>
@@ -96,7 +96,7 @@ export function FailureTestPage({
       </>}
       <div className="replay-stats-grid">
         <div><small>시험용 점수 · 실제 공고 수 아님</small><strong>{lastGood ? `${lastGood.normalized_value.toLocaleString("ko-KR")} ${lastGood.unit}` : "아직 없음"}</strong><span>{lastGood ? `${lastGood.record_date} · ${failed ? "이전 시험값, 최신값 아님" : "예시 시험값"}` : "문제없이 자료를 가져오면 표시돼요"}</span></div>
-        <div><small>날짜별 기록</small><strong>{rows.length}건</strong><span>예시 자료로 저장한 날짜 수</span></div>
+        <div><small>날짜별 기록</small><strong>{replay ? `${rows.length}건` : "아직 없음"}</strong><span>예시 자료로 저장한 날짜 수 · 실제 공고 수 아님</span></div>
         <div><small>시험용 점수 변화</small><strong>{replay?.last_delta === null || replay?.last_delta === undefined ? "비교할 자료 없음" : `${replay.last_comparison.direction === "increase" ? "+" : replay.last_comparison.direction === "decrease" ? "−" : ""}${replay.last_delta} ${replay.last_comparison.unit}`}</strong><span>실제 공고 건수의 변화가 아닌 예시값</span></div>
         <div><small>확인한 상황</small><strong>{replay?.last_run?.fixture_id ? failures.find((item) => item.fixture === replay.last_run?.fixture_id)?.label ?? "자료 복구" : "아직 없음"}</strong><span>{displayTime(replay?.last_run?.virtual_now)}</span></div>
       </div>
