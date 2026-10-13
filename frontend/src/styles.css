@@ -145,3 +145,7 @@ body{background:radial-gradient(ellipse at 78% 7%,#fffaf0 0,transparent 35%),#ed
 .trend-chart-meta{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:5px 3px 8px;padding:11px 4px 2px;border-top:1px solid #e8ece3}.trend-meta-source{display:flex;align-items:center;gap:8px;color:#62766a;font-size:11px;font-weight:600}.trend-meta-source i{width:7px;height:7px;flex:none;border-radius:50%;background:#6da783;box-shadow:0 0 0 3px #e7f1e7}.trend-meta-details{display:flex;align-items:center;gap:18px}.trend-meta-details>span{display:grid;gap:3px}.trend-meta-details small{color:#89958b;font-size:9px}.trend-meta-details strong{color:#3f5e4d;font-size:11px;font-weight:700;white-space:nowrap}
 @media(max-width:720px){.trend-chart-meta{align-items:flex-start;flex-direction:column;gap:10px;padding:10px 3px 2px}.trend-meta-details{justify-content:space-between;width:100%;gap:8px}.trend-meta-source{font-size:10px}.trend-meta-details small{font-size:9px}.trend-meta-details strong{font-size:10px}}
 .metric-card-compact-meta .metric-copy>span{font-size:9px;line-height:1.35;color:#758579;letter-spacing:0}
+
+
+/* Keep every navigation item visible on narrow phones instead of clipping a scroll row. */
+@media(max-width:420px){body{min-width:0}.main-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;overflow:visible;padding:0}.nav-item{width:100%;min-width:0;justify-content:flex-start;white-space:normal;padding:9px 10px}.nav-item span{min-width:0;overflow-wrap:anywhere}}
