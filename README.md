@@ -13,6 +13,8 @@
 
 ## 실행
 
+Render에서 다른 PC와 같은 데이터를 공유하려면 [Render 배포 안내](docs/render-deploy.md)를 따릅니다. 현재는 연결 준비 단계이며 실제 DB는 만들지 않습니다. `DATABASE_URL`이 없으면 기존 SQLite를 사용하고, 설정하면 PostgreSQL의 `t04` 스키마에 저장합니다. 자동 수집은 기본 OFF이며 버튼으로 수집합니다.
+
 백엔드는 `cd backend`, 가상환경에서 `pip install -r requirements.txt`, 이어서 `uvicorn app.main:app --reload`로 실행합니다. 프런트엔드는 `cd frontend`, `pnpm install`, `pnpm dev`로 실행합니다. 백엔드는 `http://127.0.0.1:8000`, 프런트엔드는 `http://127.0.0.1:5173`에서 엽니다.
 
 ## 설정

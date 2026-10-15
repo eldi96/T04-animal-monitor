@@ -14,7 +14,7 @@ from app.models.schemas import (
 from app.services.monitoring import MonitoringService
 from app.services.replay import ReplayService
 from app.services.animal_api import ProviderError, collect_snapshot
-from app.storage.repository import SQLiteRepository
+from app.storage.factory import create_repository
 
 
 router = APIRouter(prefix="/api")
@@ -23,9 +23,7 @@ replay_service = ReplayService()
 
 
 def get_service() -> MonitoringService:
-    from app.config import get_database_path
-
-    return MonitoringService(SQLiteRepository(get_database_path()))
+    return MonitoringService(create_repository())
 
 
 @router.get("/status", response_model=MonitoringStatus)

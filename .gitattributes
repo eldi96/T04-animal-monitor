@@ -1,0 +1,2 @@
+# Preserve the exact bytes verified by the public fixture manifest.
+assets/studio-task-assets/t04-real-information-board/** -text

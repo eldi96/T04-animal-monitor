@@ -11,14 +11,14 @@ from app.models.schemas import (
     LatestView,
     MonitoringStatus,
 )
-from app.storage.repository import SQLiteRepository
+from app.storage.base import RecordRepository
 
 
 KST = ZoneInfo("Asia/Seoul")
 
 
 class MonitoringService:
-    def __init__(self, repository: SQLiteRepository):
+    def __init__(self, repository: RecordRepository):
         self.repository = repository
 
     def record_success(self, record: DailyRecord) -> DailyRecord:

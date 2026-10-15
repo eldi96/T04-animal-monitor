@@ -1,6 +1,6 @@
 import type { DailyRecord, LatestView, MonitoringStatus, ReplayFixtureId, ReplayPackageStatus, ReplayState } from "../types/api";
 
-const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8000";
+const baseUrl = import.meta.env.VITE_API_BASE_URL ?? (import.meta.env.DEV ? "http://127.0.0.1:8000" : "");
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${baseUrl}${path}`, init);

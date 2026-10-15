@@ -5,6 +5,7 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 backend/.pytest-tmp-*/
+backend/.pytest-render*/
 .venv/
 venv/
 backend/.test-deps/
