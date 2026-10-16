@@ -1,7 +1,12 @@
-name: Publish static preview
+name: Publish site redirect
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'pages/**'
+      - '.github/workflows/pages.yml'
 
 permissions:
   contents: read
@@ -16,31 +21,12 @@ jobs:
     steps:
       - name: Check out source
         uses: actions/checkout@v4
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 12.8.1
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: pnpm
-          cache-dependency-path: frontend/pnpm-lock.yaml
-      - name: Install dependencies
-        working-directory: frontend
-        run: pnpm install --frozen-lockfile
-      - name: Build static preview
-        working-directory: frontend
-        env:
-          GITHUB_PAGES: "true"
-          VITE_STATIC_PREVIEW: "true"
-        run: pnpm build
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: frontend/dist
+          path: pages
 
   deploy:
     needs: build
@@ -52,6 +38,6 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy static preview
+      - name: Deploy site redirect
         id: deployment
         uses: actions/deploy-pages@v4
