@@ -73,7 +73,11 @@ export function HomePage({ view, records, onNavigate }: { view: LatestView | nul
   const yesterdayDate = (() => { const d = new Date(`${todayInKst()}T00:00:00Z`); d.setUTCDate(d.getUTCDate() - 1); return d.toISOString().slice(0, 10); })();
   const yesterdayRecord = history.find((record) => record.basis_date === yesterdayDate) ?? null;
   const recheckedYesterdayCount = current?.recent_7_day_registration_counts?.[yesterdayDate];
-  const yesterdayDelta = current && yesterdayRecord ? current.value - yesterdayRecord.value : null;
+  // The current snapshot already persists registration-date counts for seven days.
+  // Use its yesterday count when no snapshot was collected on that date.
+  const previousCount = yesterdayRecord?.value ?? (!failed ? recheckedYesterdayCount : undefined);
+  const previousFromSnapshot = yesterdayRecord !== null;
+  const yesterdayDelta = !failed && current && previousCount !== undefined ? current.value - previousCount : null;
   const weekStart = (() => { const d = new Date(`${todayInKst()}T00:00:00Z`); d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7) - 7); return d; })();
   const weeklySnapshot = current ?? (!failed ? latestHistory : null);
   const targetWeekDates = Array.from({ length: 7 }, (_, index) => {
@@ -102,7 +106,7 @@ export function HomePage({ view, records, onNavigate }: { view: LatestView | nul
     <header className="page-header home-header"><div><p className="eyebrow">DAEJEON · ANIMAL NOTICE MONITOR</p><h1>대전 유기동물 공고 현황</h1><p>대전의 유기동물 공고를 살피고, 필요한 정보를 신뢰할 수 있게 전합니다.</p></div><div className="home-pets" aria-hidden="true"><span>🐕</span><span>🐈</span></div><div className="header-aside"><span>{failed || !current ? "마지막 정상 수집 시각 (KST)" : "오늘 수집 시각 (KST)"}</span><strong>{kstTimestamp(latestTimestamp)}</strong><span className={`status-pill ${failed ? "danger" : current ? "success" : "pending"}`}><i/>{statusLabel}</span></div></header>
 
     <section className="metric-grid" aria-label="핵심 지표">
-      <MetricCard icon="chart" label="이전 수집 대비" value={yesterdayRecord ? yesterdayRecord.value.toLocaleString("ko-KR") : "비교 대기"} unit={yesterdayRecord ? "건" : undefined} detail={yesterdayRecord ? `어제 ${yesterdayDate} 등록 공고 · 실제 저장값` : `어제(${yesterdayDate}) 실제 수집 기록이 필요합니다.`} secondary={failed ? "오늘 최신값 확인 불가 · 어제 기록은 과거값" : yesterdayDelta === null ? "오늘 실제 수집 후 증감 표시" : `오늘 ${yesterdayDelta > 0 ? "+" : ""}${yesterdayDelta.toLocaleString("ko-KR")}건 대비`}/>
+      <MetricCard icon="chart" label="어제 등록 공고 대비" value={previousCount !== undefined ? previousCount.toLocaleString("ko-KR") : "비교 대기"} unit={previousCount !== undefined ? "건" : undefined} detail={previousCount !== undefined ? `어제 ${yesterdayDate} 등록 공고 · ${previousFromSnapshot ? "당시 저장값" : "오늘 조회값"}` : "스냅샷을 수집하면 어제 등록 건수도 함께 표시합니다."} secondary={failed ? "오늘 최신값 확인 불가 · 어제 기록은 과거값" : yesterdayDelta === null ? "오늘 실제 수집 후 증감 표시" : `오늘 ${yesterdayDelta > 0 ? "+" : ""}${yesterdayDelta.toLocaleString("ko-KR")}건 대비`}/>
       <MetricCard icon="calendar" label="오늘 등록된 공고 수" value={failed ? "확인 불가" : current ? current.value.toLocaleString("ko-KR") : "오늘 수집 전"} unit={!failed && current ? "건" : undefined} detail={current ? `${current.basis_date} KST · 게시글 등록일 기준` : failed ? "새 API 응답을 확인할 수 없습니다." : "오늘 수집 전입니다. 이전 수집 값은 비교 카드에 반영됩니다."} primary secondary={failed && view?.last_known_good ? `마지막 정상값 ${view.last_known_good.value.toLocaleString("ko-KR")}건 · 현재값 아님` : "API 전체 페이지에서 오늘 등록된 공고만 집계"}/>
       <MetricCard icon="chart" label="지난주 등록 공고 수" value={failed ? "확인 불가" : previousWeekTotal === null ? "기록 대기" : previousWeekTotal.toLocaleString("ko-KR")} unit={!failed && previousWeekTotal !== null ? "건" : undefined} detail={`지난주 ${weekStartLabel} — ${weekEndLabel}`} secondary={failed ? "마지막 주간 집계는 현재값처럼 표시하지 않습니다." : weeklyCounts ? `월–일 · API 등록일 기준 · 조회 ${weeklySnapshot?.basis_date}` : "해당 날짜 범위를 포함한 실제 수집 기록이 필요합니다."} breakdown={!failed && weeklyCounts ? weekDays.map(({ label, value }) => ({ label, value })) : undefined} compactMeta/>
     </section>
@@ -110,10 +114,10 @@ export function HomePage({ view, records, onNavigate }: { view: LatestView | nul
     <section className="surface-card yesterday-verification" aria-label="어제 등록 공고 확인">
       <div className="section-heading"><div><h2>어제 등록분 확인</h2><p>저장 당시 기록과 오늘 다시 조회한 값을 구분합니다.</p></div><span className="select-like">{yesterdayDate}</span></div>
       <div className="yesterday-verification-grid">
-        <article className="yesterday-value saved"><span>어제 실제 수집 기록</span><strong>{yesterdayRecord ? `${yesterdayRecord.value.toLocaleString("ko-KR")}건` : "기록 없음"}</strong><small>{yesterdayRecord ? `조회 ${kstTimestamp(yesterdayRecord.fetched_at_kst)} · 당시 저장값` : "어제 날짜의 실제 수집 기록이 없습니다."}</small></article>
+        <article className="yesterday-value saved"><span>이전 기록 · 어제 등록 공고</span><strong>{previousCount !== undefined ? `${previousCount.toLocaleString("ko-KR")}건` : "수집 대기"}</strong><small>{yesterdayRecord ? `조회 ${kstTimestamp(yesterdayRecord.fetched_at_kst)} · 당시 저장값` : previousCount !== undefined ? `조회 ${kstTimestamp(current?.fetched_at_kst)} · 오늘 확인해 저장한 어제 등록분` : "스냅샷 버튼을 누르면 오늘·어제 등록 건수를 함께 가져옵니다."}</small></article>
         <article className={`yesterday-value ${failed ? "unavailable" : "rechecked"}`}><span>오늘 조회에서 확인한 어제 등록분</span><strong>{failed ? "확인 불가" : recheckedYesterdayCount !== undefined ? `${recheckedYesterdayCount.toLocaleString("ko-KR")}건` : current ? "응답에 날짜 집계 없음" : "오늘 실제 수집 전"}</strong><small>{failed ? "현재 API 응답을 확인할 수 없습니다." : current ? `regDtTm 기준 · 조회 ${kstTimestamp(current.fetched_at_kst)}` : "오늘 정상 수집 후 확인할 수 있습니다."}</small></article>
       </div>
-      <p className="yesterday-verification-note">조회 시점이 다른 두 값은 다를 수 있습니다. 오늘 다시 확인한 값은 어제의 저장 기록을 덮어쓰지 않습니다.</p>
+      <p className="yesterday-verification-note">어제 수집한 기록이 있으면 우선 표시하고, 없으면 오늘 스냅샷에 함께 저장된 어제 등록 건수를 표시합니다. 오늘 조회값은 어제 당시의 저장 기록을 덮어쓰지 않습니다.</p>
     </section>
 
     <section className="home-grid">
